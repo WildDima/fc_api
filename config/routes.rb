@@ -1,6 +1,3 @@
 FcApi::Engine.routes.draw do
-  get 'main/index'
-
-  get 'main/edit'
-
+  resources :main, only: [:index, :edit]
 end
