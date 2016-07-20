@@ -1,3 +1,10 @@
 = FcApi
 
-This project rocks and uses MIT-LICENSE.
+INSTALLATION
+------------
+
+If using bundler, first add to your Gemfile:
+  gem 'fc_api', path: '...'
+
+Then add to your User model:
+  include FcApi::Concerns::User

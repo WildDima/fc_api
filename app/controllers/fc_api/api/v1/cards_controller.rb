@@ -4,7 +4,6 @@ module FcApi
   class Api::V1::CardsController < ApplicationController
     before_action :authenticate_user_from_token!
     before_action :set_card, only: [:show, :destroy, :update]
-    respond_to :json
 
 
     def index
