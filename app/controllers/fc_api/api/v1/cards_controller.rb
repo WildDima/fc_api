@@ -7,7 +7,7 @@ module FcApi
 
 
     def index
-      @cards = current_user.cards.all.order('review_date')
+      @cards = current_user.cards.order('review_date')
     end
 
     def show
