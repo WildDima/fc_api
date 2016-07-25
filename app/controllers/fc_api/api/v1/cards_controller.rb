@@ -8,9 +8,11 @@ module FcApi
 
     def index
       @cards = current_user.cards.order('review_date')
+      respond_with @cards
     end
 
     def show
+      respond_with @card
     end
 
     def create
