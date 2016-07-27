@@ -7,8 +7,6 @@ module FcApi
 
 
     def review_card
-      @card = current_user.cards.find(params[:card_id])
-
       check_result = @card.check_translation(trainer_params[:user_translation])
 
       if check_result[:state]
@@ -23,23 +21,28 @@ module FcApi
       else
         @message = t(:incorrect_translation_alert)
       end
-      respond_with @message
+      render json: @message.to_json
     end
 
 
     private
 
     def authenticate_user_from_token!
-      user_token = params[:user_token].presence
-      user       = user_token && User.find_by_authentication_token(user_token.to_s)
+      user_token   = params[:user_token].presence
+      current_user = user_token && User.find_by_authentication_token(user_token.to_s)
 
-      if user
-        auto_login user
+      if current_user
+        auto_login current_user
       end
+      p current_user
     end
 
     def set_card
       @card = current_user.cards.find(params[:id])
+    end
+
+    def trainer_params
+      params.permit(:user_translation)
     end
   end
 end
