@@ -8,3 +8,7 @@ If using bundler, first add to your Gemfile:
 
 Then add to your User model:
   include FcApi::Concerns::User
+
+cURL example:
+  curl -X PUT -H "Content-Type: multipart/form-data;" -H "Cache-Control: no-cache" -F "user_token=TOKEN" -F "id=ID" -F "user_translation=TRANSLATE" "http://localhost:1234/fc_api/api/v1/review_card.json"
+
