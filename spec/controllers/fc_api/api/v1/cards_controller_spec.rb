@@ -12,38 +12,78 @@ module FcApi
     before do
       allow(controller).to receive(:current_user).and_return(user)
       allow(user).to receive_message_chain('cards.order') { [card] }
+      allow(controller).to receive(:respond_with) { controller.render json: card.to_json }
+      allow(user).to receive_message_chain('cards.find') { card }
     end
 
     describe 'GET #index' do
-      it 'returns http success' do
-        get :index, format: :json
+      subject! { get :index, format: :json }
 
-        expect(response).to have_http_status(:success)
+      it { should have_http_status :success }
+
+      it 'should return cards' do
         expect(assigns(:cards)).to eq([card])
+      end
+
+      it 'returns correct user' do
         expect(controller.current_user).to eq(user)
       end
     end
 
     describe 'GET #show' do
-      it 'returns http success' do
-        allow(user).to receive_message_chain('cards.find') { card }
-        get :show, id: 1, format: :json
+      subject! { get :show, id: 1, format: :json }
 
-        expect(response).to have_http_status(:success)
+      it { should have_http_status :success }
+
+      it 'should return card' do
         expect(assigns(:card)).to eq(card)
-        expect(controller.current_user).to eq(user)
+      end
+
+      it 'returns correct user' do
+        allow(user).to receive_message_chain('cards.find') { card }
       end
     end
 
     describe 'GET #create' do
-      it 'returns http success' do
+      before do
         allow(Card).to receive(:new) { card }
         allow(card).to receive(:save)
-        allow(controller).to receive(:respond_with) { card.to_json }
-        post :create, card_valid_params.merge(format: :json)
+      end
 
-        expect(response).to have_http_status(:success)
-        expect(controller.current_user).to eq(user)
+      subject! { post :create, card_valid_params.merge(format: :json) }
+
+      it { should have_http_status :success }
+
+      it 'should return card' do
+        expect(assigns(:card)).to eq(card)
+      end
+    end
+
+    describe 'PATCH #update' do
+      before do
+        allow(card).to receive(:update_attributes) { card }
+      end
+
+      subject! { patch :update, id: 1, card: card_valid_params.merge(format: :json) }
+
+      it { should have_http_status :success }
+
+      it 'should return card' do
+        expect(assigns(:card)).to eq(card)
+      end
+    end
+
+    describe 'PATCH #destroy' do
+      before do
+        allow(card).to receive(:destroy) { card }
+      end
+
+      subject! { delete :destroy, id: 1 }
+
+      it { should have_http_status :success }
+
+      it 'should return card' do
+        expect(assigns(:card)).to eq(card)
       end
     end
   end
