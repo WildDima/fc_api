@@ -2,13 +2,14 @@ require_dependency "fc_api/application_controller"
 
 module FcApi
   class Api::V1::CardsController < ApplicationController
-    before_action :authenticate_user_from_token!
     before_action :set_card, only: [:show, :destroy, :update]
 
 
     def index
-      @cards = current_user.cards.order('review_date')
-      respond_with @cards
+      @cards = Rails.cache.fetch([params[:controller], params[:action], current_user.id]) do
+        current_user.cards.order('review_date')
+      end
+        respond_with @cards
     end
 
     def show
@@ -31,7 +32,6 @@ module FcApi
       respond_with @card
     end
 
-
     private
 
     def card_params
@@ -39,17 +39,12 @@ module FcApi
                                    :image, :remote_image_url, :image_cache, :remove_image, :block_id)
     end
 
-    def authenticate_user_from_token!
-      user_token = params[:user_token].presence
-      user       = user_token && User.find_by_authentication_token(user_token.to_s)
-
-      if user
-        auto_login user
-      end
-    end
-
     def set_card
-      @card = current_user.cards.find(params[:id])
+      @card = cache([params[:controller], params[:action], current_user.id]) do
+        current_user.cards.find(params[:id])
+      end
+    rescue => e
+      respond_with e.message
     end
   end
 end

@@ -2,7 +2,6 @@ require_dependency "fc_api/application_controller"
 
 module FcApi
   class Api::V1::TrainerController < ApplicationController
-    before_action :authenticate_user_from_token!
     before_action :set_card
 
 
@@ -27,18 +26,10 @@ module FcApi
 
     private
 
-    def authenticate_user_from_token!
-      user_token   = params[:user_token].presence
-      current_user = user_token && User.find_by_authentication_token(user_token.to_s)
-
-      if current_user
-        auto_login current_user
-      end
-      p current_user
-    end
-
     def set_card
       @card = current_user.cards.find(params[:id])
+    rescue => e
+      respond_with e.message
     end
 
     def trainer_params
